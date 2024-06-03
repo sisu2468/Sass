@@ -9,7 +9,7 @@ import {
   Filler,
   Legend,
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2';
 import TitleCard from '../../../components/Cards/TitleCard';
 
 ChartJS.register(
@@ -42,7 +42,7 @@ function LineChart(){
   datasets: [
     {
       fill: true,
-      label: 'MAU',
+      label: 'Credit',
       data: labels.map(() => { return Math.random() * 100 + 500 }),
       borderColor: 'rgb(53, 162, 235)',
       backgroundColor: 'rgba(53, 162, 235, 0.5)',
@@ -52,9 +52,10 @@ function LineChart(){
   
 
     return(
-      <TitleCard title={"Montly Active Users (in K)"}>
-          <Line data={data} options={options}/>
-      </TitleCard>
+      <></>
+      // <TitleCard title={"User Credit History"}>
+      //     <Bar data={data} options={options}/>
+      // </TitleCard>
     )
 }
 

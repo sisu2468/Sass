@@ -4,17 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { setPageTitle } from '../../features/common/headerSlice'
 import { Table, Input, ColorPicker, Collapse, Space, Select, Typography, Button, Flex} from 'antd'
 import { ClearOutlined, OpenAIOutlined, ToTopOutlined } from '@ant-design/icons';
-import moment from 'moment'
 import TitleCard from '../../components/Cards/TitleCard'
-import query from '../../utils/query'
-import TrashIcon from '@heroicons/react/24/outline/TrashIcon'
-import EyeIcon from '@heroicons/react/24/outline/EyeIcon'
 
 const { Column } = Table;
 <script src="https://cdn.tailwindcss.com"></script>
 
 function Result() {
-    const { t } = useTranslation()
     const { TextArea } = Input;
     const { Option } = Select;
     const { Title } = Typography;
@@ -24,56 +19,6 @@ function Result() {
     useEffect(() => {
         dispatch(setPageTitle({ title: "result" }))
     }, [])
-
-    const [PKS, set_PKS] = useState([]);
-    const [AES, set_AES] = useState([]);
-
-    useEffect(() => {
-        query.get('/PKS', (res) => {
-            set_PKS(res.result);
-        });
-        query.get('/AES', (res) => {
-            set_AES(res.result);
-        }, [])
-    }, [])
-
-    const [tableData1, setTableData1] = useState([]);
-    const [tableData2, setTableData2] = useState([]);
-
-    const [search1, setSearch1] = useState('');
-    const [search2, setSearch2] = useState('');
-
-    useEffect(() => {
-        setTableData1(PKS.filter(row => (row.name.indexOf(search1) >= 0 || moment(row.createdAt).format('YYYY-MM-DD HH:mm').indexOf(search1) >= 0)).map(row => {
-            return {
-                ...row, key: row._id, action:
-                    <div className='flex gap-2'>
-                        <EyeIcon className='w-4 h-4 cursor-pointer' onClick={() => { window.location.href = `/app/PKS?_id=${row._id}` }} />
-                        <TrashIcon className='w-4 h-4 text-red-500 cursor-pointer' onClick={() => {
-                            query.delete('/PKS/' + row._id)
-                            set_PKS(PKS.filter(({ _id }) => _id != row._id));
-                        }} />
-                    </div>,
-                datetime: moment(row.createdAt).format('YYYY-MM-DD HH:mm')
-            }
-        }))
-    }, [PKS, search1])
-
-    useEffect(() => {
-        setTableData2(AES.filter(row => (row.name.indexOf(search2) >= 0 || moment(row.createdAt).format('YYYY-MM-DD HH:mm').indexOf(search2) >= 0)).map(row => {
-            return {
-                ...row, key: row._id, action:
-                    <div className='flex gap-2'>
-                        <EyeIcon className='w-4 h-4 cursor-pointer' onClick={() => { window.location.href = `/app/AES?_id=${row._id}` }} />
-                        <TrashIcon className='w-4 h-4 text-red-500 cursor-pointer' onClick={() => {
-                            query.delete('/AES/' + row._id);
-                            set_AES(AES.filter(({ _id }) => _id != row._id));
-                        }} />
-                    </div>,
-                datetime: moment(row.createdAt).format('YYYY-MM-DD HH:mm')
-            }
-        }));
-    }, [AES, search2])
 
     const[bkcolor, setBkColor] = useState('#2a323c')
     const[textcolor, setTextColor] = useState('#3F6AA6')
@@ -155,7 +100,23 @@ function Result() {
     const OpenAIKey = (e) => {
         setOpenAIKey(e.target.value)
     }
-
+    // Assuming you have a function called 'handleSubmit' that is called when the submit button is clicked
+    function handleSubmit() {
+        // Get the current URL
+        const currentUrl = window.location.href;
+    
+        // Extract the domain from the current URL
+        const domain = new URL(currentUrl).hostname.split('.').slice(-2).join('.');
+    
+        // Generate a new subdomain
+        const subdomain = `subdomain-${Date.now()}.${domain}`;
+    
+        // Construct the new URL with the subdomain
+        const newUrl = `http://${subdomain}${window.location.pathname}${window.location.search}`;
+    
+        // Redirect the user to the new URL
+        window.location.href = newUrl;
+    }
     return (
         <div className='flex gap-4 flex-wrap lg:flex-nowrap'>
             <TitleCard className="flex-grow" title={"Edit"}>
@@ -252,7 +213,7 @@ function Result() {
                     <textarea className='mb-4 w-full rounded-lg	' rows={4} placeholder={formfield} maxLength={1000} onChange={SetForm} value={myform}/>
                     <div wrap className='flex item-center justify-center'>
                         <button className='mr-10	rounded-md	w-20 font-bold text-white	' defaultBg={buttoncolor} style={{backgroundColor: buttoncolor}} iconPosition={position} onClick={setClear} >Clear<i data-lucide="paintbrush"></i></button>
-                        <button className='rounded-md h-10	w-20 font-bold text-white	'	defaultBg={buttoncolor} style={{backgroundColor: buttoncolor}} iconPosition='end' >Submit</button>
+                        <button className='rounded-md h-10	w-20 font-bold text-white	'	defaultBg={buttoncolor} style={{backgroundColor: buttoncolor}} iconPosition='end' onClick={handleSubmit}>Submit</button>
                     </div>
                 </div>
             </TitleCard>

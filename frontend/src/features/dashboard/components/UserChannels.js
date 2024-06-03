@@ -10,7 +10,7 @@ const userSourceData = [
 
 function UserChannels(){
     return(
-        <TitleCard title={"User Credit History"}>
+        <TitleCard title={"Credit History"}>
              {/** Table Data */}
              <div className="overflow-x-auto">
                 <table className="table w-full">
