@@ -26,7 +26,7 @@ const routes = [
     component: dashboard,
   },
   {
-    path: '/payment/stripe',
+    path: '/payment',
     component: StripePaymentPage,
   },
   {

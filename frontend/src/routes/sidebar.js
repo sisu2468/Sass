@@ -34,7 +34,7 @@ const routes = [
     name: 'App'
   },
   {
-    path: '/app/payment/stripe',
+    path: '/app/payment',
     icon: <CurrencyDollarIcon className={submenuIconClasses} />,
     name: 'payment'
   },

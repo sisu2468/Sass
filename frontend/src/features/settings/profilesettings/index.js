@@ -4,7 +4,7 @@ import md5 from 'md5'
 import { showNotification } from '../../common/headerSlice'
 import { login } from '../../common/userSlice'
 import query from "../../../utils/query"
-import TitleCard from "../../../components/Cards/TitleCard"
+import Cards from "../../../components/Cards/Cards"
 import AvatarUploader from "../../common/components/AvatarUploader"
 import { useTranslation } from "react-i18next"
 import i18next from "i18next"
@@ -19,7 +19,6 @@ function ProfileSettings() {
     const [userInfo, setUserInfo] = useState({ name: '', email: '', pwd: '', pwd_confirm: '' })
 
     const [isUpdated, setIsUpdated] = useState(false)
-
     useEffect(() => {
         if (user?.name == userInfo.name && userInfo.pwd.length == 0) setIsUpdated(false)
         else setIsUpdated(true)
@@ -66,7 +65,7 @@ function ProfileSettings() {
 
     return (
         <>
-            <TitleCard title={t('profile_setting')} topMargin="mt-2">
+            <Cards title={t('profile_setting')} topMargin="mt-2">
                 <div className="flex justify-center">
                     <AvatarUploader src={user ? `${process.env.REACT_APP_BASE_URL}file/${user.avatar}` : '/assets/avatar/default.png'} ref={avatarRef} onUpdate={() => setIsUpdated(true)}/>
                 </div>
@@ -102,7 +101,7 @@ function ProfileSettings() {
                 <div className="mt-16">
                     <button disabled={!isUpdated} className="btn btn-primary float-right" onClick={() => updateProfile()}>{t('update')}</button>
                 </div>
-            </TitleCard>
+            </Cards>
         </>
     )
 }

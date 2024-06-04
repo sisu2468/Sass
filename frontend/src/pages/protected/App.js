@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { setPageTitle } from '../../features/common/headerSlice'
-import { Table, Input, ColorPicker, Collapse, Space, Select, Typography, Button, Flex} from 'antd'
-import { ClearOutlined, OpenAIOutlined, ToTopOutlined } from '@ant-design/icons';
+import { Table, Input, ColorPicker, Dropdown, Radio, Select, Typography, Button, Image, Upload} from 'antd'
+import { EyeOutlined, RocketOutlined, DownOutlined, UploadOutlined } from '@ant-design/icons';
 import TitleCard from '../../components/Cards/TitleCard'
+
 
 const { Column } = Table;
 <script src="https://cdn.tailwindcss.com"></script>
@@ -13,6 +14,7 @@ function Result() {
     const { TextArea } = Input;
     const { Option } = Select;
     const { Title } = Typography;
+    const [eyestate, setEyeState] = useState(true);
 
     const dispatch = useDispatch()
 
@@ -95,7 +97,10 @@ function Result() {
     const setClear = (e) => {
         setMyform('')
     }
-
+    const EyeChange = () => {
+        setEyeState(prevEyeState => !prevEyeState);
+    };
+    console.log(eyestate)
     const[openaikey, setOpenAIKey] = useState('')
     const OpenAIKey = (e) => {
         setOpenAIKey(e.target.value)
@@ -117,10 +122,70 @@ function Result() {
         // Redirect the user to the new URL
         window.location.href = newUrl;
     }
+    const [loadings, setLoadings] = useState([]);
+    const enterLoading = (index) => {
+        setLoadings((state) => {
+          const newLoadings = [...state];
+          newLoadings[index] = true;
+          return newLoadings;
+        });
+        setTimeout(() => {
+          setLoadings((state) => {
+            const newLoadings = [...state];
+            newLoadings[index] = false;
+            return newLoadings;
+          });
+        }, 6000);
+      };
+      const items = [
+        {
+            label: 'Submit and continue',
+            key: '1',
+        },
+        {
+            label: 'Submit and continue',
+            key: '2',
+        }
+      ];
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [fileList, setFileList] = useState([]);
+    const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
+    };
+    const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+    const uploadButton = (
+    <button
+        style={{
+        border: 0,
+        background: 'none',
+        }}
+        type="button"
+    >
+        <UploadOutlined />
+        <div
+        style={{
+            marginTop: 8,
+        }}
+        >
+        Upload
+        </div>
+    </button>
+    );
+    const getBase64 = (file) =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+    });
     return (
         <div className='flex gap-4 flex-wrap lg:flex-nowrap'>
-            <TitleCard className="flex-grow" title={"Edit"}>
-                    {/* <OpenAIOutlined /> */}
+            {/* <TitleCard className="flex-grow" title={"Edit"}>
                 <Space direction="vertical" className='w-full'>
                     <Collapse
                         collapsible="header"
@@ -204,17 +269,133 @@ function Result() {
                         ]}
                     />
                 </Space>
-            </TitleCard>
-            <TitleCard className="flex-grow" title={"Preview & Test Window"}>
-                <div className='px-20 h-full' style={{ backgroundColor: bkcolor, color: textcolor }}>
-                    <h1 style={{ color: textcolor}} className='text-center mb-5 pt-8 text-4xl font-bold	'>{title}</h1>
-                    <h2 style={{color: textcolor}} className='text-2xl mb-5'>{description}</h2>
-                    <h3 style={{color: textcolor}} className='text-xl mb-5'>{formlabel}</h3>
-                    <textarea className='mb-4 w-full rounded-lg	' rows={4} placeholder={formfield} maxLength={1000} onChange={SetForm} value={myform}/>
-                    <div wrap className='flex item-center justify-center'>
-                        <button className='mr-10	rounded-md	w-20 font-bold text-white	' defaultBg={buttoncolor} style={{backgroundColor: buttoncolor}} iconPosition={position} onClick={setClear} >Clear<i data-lucide="paintbrush"></i></button>
-                        <button className='rounded-md h-10	w-20 font-bold text-white	'	defaultBg={buttoncolor} style={{backgroundColor: buttoncolor}} iconPosition='end' onClick={handleSubmit}>Submit</button>
+            </TitleCard> */}
+            <TitleCard
+                className="flex-grow"
+                title={"Title of the form (editable)"}
+                EyeIcon={true}
+                TopSideButtons={'Publish'}
+                isVisible={eyestate}
+                onEyeChange={EyeChange}
+            >
+                <div className='mt-8'>
+                    <p>This is just a test form with all components.</p>
+                    <div className='mt-8 flex flex-col'>
+                        <label>Label (for short answer)</label>
+                        <Input className='mt-2' showCount maxLength={120} style={{width: 400}}/>
                     </div>
+                    <div className='mt-8'>
+                        <label>Label (for long answer / Active)</label>
+                        <TextArea
+                            showCount
+                            maxLength={1000}
+                            className='mt-2'
+                            // placeholder="disable resize"
+                            style={{
+                                width: 600,
+                                height: 160
+                            }}
+                        />
+                    </div>
+                    <div className='mt-8 flex flex-col'>
+                        <label>Label (for single select)</label>
+                        <Radio.Group name="radiogroup" className='mt-2' defaultValue={1}>
+                            <Radio value={1}>A</Radio>
+                            <Radio value={2}>B</Radio>
+                            <Radio value={3}>C</Radio>
+                        </Radio.Group>
+                    </div>
+                    <div className='mt-8 flex flex-col'>
+                        <label>Label (for Multi select)</label>
+                        <Radio.Group name="radiogroup" className='mt-2' defaultValue={1}>
+                            <Radio value={1}>A</Radio>
+                            <Radio value={2}>B</Radio>
+                            <Radio value={3}>C</Radio>
+                        </Radio.Group>
+                    </div>
+                    <div className='mt-8 flex flex-col'>
+                        <label>Label (for Multi select)</label>
+                        <Dropdown.Button
+                            icon={<DownOutlined />}
+                            loading={loadings[1]}
+                            menu={{
+                                items,
+                            }}
+                            onClick={() => enterLoading(1)}
+                            style = {{
+                                width: 400
+                            }}
+                        >
+                            Search
+                        </Dropdown.Button>
+                    </div>
+                    <div className='mt-8 flex flex-col'>
+                        <label>Label (for Multi select)</label>
+                        <Upload
+                            action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+                            listType="picture-circle"
+                            fileList={fileList}
+                            className='mt-2'
+                            onPreview={handlePreview}
+                            onChange={handleChange}
+                        >
+                            {fileList.length >= 8 ? null : uploadButton}
+                        </Upload>
+                        {previewImage && (
+                            <Image
+                            wrapperStyle={{
+                                display: 'none',
+                            }}
+                            preview={{
+                                visible: previewOpen,
+                                onVisibleChange: (visible) => setPreviewOpen(visible),
+                                afterOpenChange: (visible) => !visible && setPreviewImage(''),
+                            }}
+                            src={previewImage}
+                            />
+                        )}
+                    </div>
+                    <div className='mt-8 flex flex-col'>
+                        <label>Label (for Multi select)</label>
+                        <Input rows={4} className='mt-2' placeholder="" maxLength={10} style={{width: 400}}/>
+                    </div>
+                </div>
+            </TitleCard>
+
+            <TitleCard
+                className="flex-grow"
+                title={"Preview & Test Window"}
+                isVisible={eyestate}
+            >
+                <div className='px-20 h-full py-5' style={{ backgroundColor: bkcolor, color: textcolor }}>
+                <h1 style={{ color: textcolor }} className='text-center mb-5 pt-8 text-4xl font-bold'>{title}</h1>
+                <h2 style={{ color: textcolor }} className='text-2xl mb-5'>{description}</h2>
+                <h3 style={{ color: textcolor }} className='text-xl mb-5'>{formlabel}</h3>
+                <textarea
+                    className='mb-4 w-full rounded-lg'
+                    rows={4}
+                    placeholder={formfield}
+                    maxLength={1000}
+                    onChange={e => setMyform(e.target.value)}
+                    value={myform}
+                    style = {{height: 200}}
+                />
+                <div wrap className='flex item-center justify-center'>
+                    <button
+                    className='mr-10 rounded-md w-20 font-bold text-white'
+                    style={{ backgroundColor: buttoncolor }}
+                    onClick={() => setMyform('')}
+                    >
+                    Clear<i data-lucide="paintbrush"></i>
+                    </button>
+                    <button
+                    className='rounded-md h-10 w-20 font-bold text-white'
+                    style={{ backgroundColor: buttoncolor }}
+                    onClick={() => alert('Form submitted!')}
+                    >
+                    Submit
+                    </button>
+                </div>
                 </div>
             </TitleCard>
         </div >

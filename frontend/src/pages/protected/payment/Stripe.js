@@ -1,15 +1,15 @@
 import query from '../../../utils/query'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 import { setPageTitle } from '../../../features/common/headerSlice'
 import { Button, Dropdown, message, Space, Tooltip} from 'antd'
-import TitleCard from "../../../components/Cards/TitleCard"
+import Cards from "../../../components/Cards/Cards"
 
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
 import CheckoutForm from '../../../features/Payment/Stripe/CheckOutForm'
+import PayPalButton from '../../../features/Payment/PayPal/PayPalButton';
 
 const stripePromise = loadStripe("pk_test_51NnacALwUcVk9eB5S9la7yylhGWheK8OBqq0JXH0asDanZMCFabjwjjMCChLlcJ9rcFUc51D80IK8X98pVGhenMf00ujmYorAy");
 const StripePaymentPage = () => {
@@ -20,8 +20,6 @@ const StripePaymentPage = () => {
     }, []);
 
     const { user } = useSelector(state => state.user);
-    const { t } = useTranslation();
-    console.log(user);
     const [client_secret, setClientSecret] = useState(null)
 
     useEffect(() => {
@@ -39,8 +37,8 @@ const StripePaymentPage = () => {
 
     const[paymenttype, setPaymentType] = useState('Stripe')
     const handleMenuClick = (e) => {
-        message.info(`Selected ${e['key']}`);
-        setPaymentType(e['key']);
+        message.info(`Selected ${e.key}`);
+        setPaymentType(e.key);
     };
     const items = [
         {
@@ -63,7 +61,7 @@ const StripePaymentPage = () => {
                     {paymenttype}
                 </Dropdown.Button>
                 {paymenttype === 'Stripe' ? (
-                    <TitleCard title='Stripe'>
+                    <Cards title='Stripe'>
                         {
                             client_secret && (
                                 <Elements stripe={stripePromise} options={
@@ -79,12 +77,11 @@ const StripePaymentPage = () => {
                                 </Elements>
                             )
                         }
-                    </TitleCard>
+                    </Cards>
                 ) :(
-                    <TitleCard title='Paypal'>
-                        
-                        
-                    </TitleCard>
+                    <Cards title='Paypal'>
+                        <PayPalButton />
+                    </Cards>
                 )}
             </div>
         </div>

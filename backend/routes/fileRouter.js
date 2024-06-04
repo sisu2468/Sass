@@ -7,4 +7,5 @@ const upload = multer({ dest: 'uploads/' });
 module.exports = (app) => {
     app.post('/api/file', upload.array('files'), fileCtr.create)
     app.get('/api/file/:_id', fileCtr.read)
+    app.post('/api/create-component', fileCtr.cteatecomponent)
 }
