@@ -68,7 +68,7 @@ exports.cteatecomponent = async (req, res) => {
         export default ${componentName};
     `;
 
-    const savePath = path.join('D:\\Works\\Global\\5_22_Nocode_AI\\Sass_System\\frontend\\src\\features\\Apps', `${componentName}.js`);
+    const savePath = path.join('\\src\\features\\Apps', `${componentName}.js`);
 
     fs.writeFile(savePath, componentContent, (err) => {
         if (err) {
