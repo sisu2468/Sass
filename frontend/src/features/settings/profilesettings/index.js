@@ -62,7 +62,7 @@ function ProfileSettings() {
         updateInfo[e.target.name] = e.target.value
         setUserInfo(updateInfo)
     }
-
+    console.log("process.env.REACT_APP_BASE_URL", process.env.REACT_APP_BASE_URL)
     return (
         <>
             <Cards title={t('profile_setting')} topMargin="mt-2">
