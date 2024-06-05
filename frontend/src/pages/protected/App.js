@@ -8,7 +8,6 @@ import TitleCard from '../../components/Cards/TitleCard'
 
 
 const { Column } = Table;
-<script src="https://cdn.tailwindcss.com"></script>
 
 function Result() {
     const { TextArea } = Input;

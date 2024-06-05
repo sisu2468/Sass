@@ -24,7 +24,7 @@ function Dashboard(){
     const statsData = user ? [
         {
             title: "Total Sales",
-            value: "$0",
+            value: '$'+user.paid,
             icon: <CreditCardIcon className='w-8 h-8'/>,
             description: "Current month"
         },

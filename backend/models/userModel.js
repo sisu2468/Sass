@@ -16,8 +16,8 @@ const UserSchema = Schema(
             required: true,
         },
         paid: {
-            type: Boolean,
-            default: false,
+            type: Number,
+            default: 0,
         },
         avatar: {
             type: String,

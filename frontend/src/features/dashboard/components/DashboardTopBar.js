@@ -32,12 +32,6 @@ function DashboardTopBar({ updateDashboardPeriod }) {
                         primaryColor="white"
                     />
                 </div>
-                <div className="text-right">
-                    <button className="btn btn-ghost btn-sm normal-case ml-2">
-                        <ShareIcon className="w-4 mr-2" />
-                        Share
-                    </button>
-                </div>
             </div>
         </>
     );

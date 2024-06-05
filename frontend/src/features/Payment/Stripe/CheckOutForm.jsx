@@ -36,6 +36,7 @@ const CheckoutForm = () => {
       // Show error to your customer (for example, payment details incomplete)
       NotificationManager.error(error.message, i18next.t('error'));
     } else {
+      console.log(paymentIntent.status);
       if (paymentIntent.status == "succeeded") {
         query.put(`/profile`, { paid: true }, () => {
           query.get('/login', (data) => {
