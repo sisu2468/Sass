@@ -38,7 +38,7 @@ const CheckoutForm = () => {
     } else {
       console.log(paymentIntent.status);
       if (paymentIntent.status == "succeeded") {
-        query.put(`/profile`, { paid: true }, () => {
+        query.put(`/profile`, { paidstatus: true }, () => {
           query.get('/login', (data) => {
             dispatch(login(data.user))
             NotificationManager.success(i18next.t('payment_success'), i18next.t('success'));

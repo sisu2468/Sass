@@ -76,8 +76,10 @@ exports.loginWithToken = async (req, res) => {
 exports.update = async (req, res) => {
     try {
         const userInfo = req.body
-        userInfo.credit = req.user.credit + 20;
-        userInfo.paid = req.user.paid + 100;
+        if (req.body.paidstatus){
+            userInfo.credit = req.user.credit + 20;
+            userInfo.paid = req.user.paid + 100;
+        }
         if (userInfo.pwd) {
             const salt = await bcrypt.genSalt(10);
             userInfo.pwd = await bcrypt.hash(userInfo.pwd, salt)
