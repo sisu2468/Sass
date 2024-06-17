@@ -41,7 +41,8 @@ const CheckoutForm = () => {
         query.put(`/profile`, { paidstatus: true }, () => {
           query.get('/login', (data) => {
             dispatch(login(data.user))
-            NotificationManager.success(i18next.t('payment_success'), i18next.t('success'));
+            // NotificationManager.success(i18next.t('payment_success'), i18next.t('success'));
+            NotificationManager.success(i18next.t('20 credits have been added.'), i18next.t('success'));
           })
         })
       }

@@ -42,7 +42,7 @@ function Dashboard(){
     }
 
     return(
-        <>
+        <div className='m-8'>
         {/** ---------------------- Select Period Content ------------------------- */}
             <DashboardTopBar updateDashboardPeriod={updateDashboardPeriod}/>
         
@@ -70,7 +70,7 @@ function Dashboard(){
             <div className="grid mt-4 grid-cols-1 gap-6">
                 <UserChannels />
             </div>
-        </>
+        </div>
     )
 }
 

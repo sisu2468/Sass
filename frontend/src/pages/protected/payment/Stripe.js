@@ -56,7 +56,7 @@ const StripePaymentPage = () => {
       };
     return (
         <div className='flex justify-center'>
-            <div className='w-[640px]'>
+            <div className='w-[640px] mt-8'>
                 <Dropdown.Button className='w-full' menu={menuProps}>
                     {paymenttype}
                 </Dropdown.Button>

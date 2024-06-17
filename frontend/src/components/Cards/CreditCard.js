@@ -43,22 +43,8 @@ function TitleCard({ title, children, topMargin, EyeIcon, TopSideButtons, isVisi
               </button>
           </div>
         </div>
-        <div className='col-span-1 mr-20'>
-          <Button type='' className="inline-block float-right bg-blue-600 text-white" onClick={NewPageCreate}>Publish</Button>
-          {EyeIcon && <button className="float-right pr-5" onClick={onEyeChange}>
-            {isVisible ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-          </button>}
-        </div>
+        
       </Subtitle>
-
-      <div className="pb-3 border-b"></div>
-
-      {(isVisible || EyeIcon) && 
-        <div className='h-full w-full pb-4 bg-base-100'>
-          {children}
-        </div>
-      }
-
     </div>
   );
 }

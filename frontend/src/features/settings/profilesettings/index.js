@@ -64,7 +64,7 @@ function ProfileSettings() {
     }
     console.log("process.env.REACT_APP_BASE_URL", process.env.REACT_APP_BASE_URL)
     return (
-        <>
+        <div className="m-8">
             <Cards title={t('profile_setting')} topMargin="mt-2">
                 <div className="flex justify-center">
                     <AvatarUploader src={user ? `${process.env.REACT_APP_BASE_URL}file/${user.avatar}` : '/assets/avatar/default.png'} ref={avatarRef} onUpdate={() => setIsUpdated(true)}/>
@@ -102,7 +102,7 @@ function ProfileSettings() {
                     <button disabled={!isUpdated} className="btn btn-primary float-right" onClick={() => updateProfile()}>{t('update')}</button>
                 </div>
             </Cards>
-        </>
+        </div>
     )
 }
 
