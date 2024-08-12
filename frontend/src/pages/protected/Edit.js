@@ -1,27 +1,25 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { setPageTitle } from '../../features/common/headerSlice'
-import { Table, Input, ColorPicker, Dropdown, Radio, Select, Typography, Button, Image, Upload} from 'antd'
-import { EyeOutlined, RocketOutlined, DownOutlined, UploadOutlined } from '@ant-design/icons';
+import { Table, Input, ColorPicker, Collapse, Space, Select, Typography, Button, Flex} from 'antd'
+import { OpenAIOutlined, RocketOutlined, DownOutlined, UploadOutlined } from '@ant-design/icons';
+
 import TitleCard from '../../components/Cards/TitleCard'
-import Heading from '../protected/Element/Heading';
-import Paragraph from '../protected/Element/Paragraph';
+import query from '../../utils/query'
 
 
 const { Column } = Table;
+<script src="https://cdn.tailwindcss.com"></script>
 
 function Result() {
     const { TextArea } = Input;
     const { Option } = Select;
     const { Title } = Typography;
     const [eyestate, setEyeState] = useState(true);
-
-    const dispatch = useDispatch()
-
-    useEffect(() => {
-        dispatch(setPageTitle({ title: "result" }))
-    }, [])
+    const [pagedata, setPageData] = useState();
+    const [searchParams] = useSearchParams();
 
     const[bkcolor, setBkColor] = useState('#2a323c')
     const[textcolor, setTextColor] = useState('#3F6AA6')
@@ -32,25 +30,37 @@ function Result() {
 
     const[formlabel, setFormLabel] = useState('My Form')
     const[formfield, setFormField] = useState('')
+    const[openaikey, setOpenAIKey] = useState('')
 
     const [position, setPosition] = useState('end');
+    const pageId = searchParams.get("id");
+    
+    useEffect(() => {
+        if(pageId) {
+            query.get(
+                'apps/find/' + pageId,
+                (res) => {
+                    setPageData(res.data);
+                    setBkColor(res.data.backgroundcolor);
+                    setTextColor(res.data.textcolor);
+                    setButtonColor(res.data.buttoncolor);
+                    setTitle(res.data.apptitle);
+                    setDescription(res.data.appdescription);
+                    setFormLabel(res.data.formlabel);
+                    setFormField(res.data.formdescription);
+                    setOpenAIKey(res.data.openAIkey);
+                }
+            )
+        }
+    }, [])
+    
+    const dispatch = useDispatch()
 
-    const [elements, setElements] = useState([]);
+    useEffect(() => {
+        dispatch(setPageTitle({ title: "result" }))
+    }, [])
 
-    const addHeading = () => {
-        setElements([...elements, { type: 'heading', content: 'New Heading' }]);
-    };
-
-    const addParagraph = () => {
-        setElements([...elements, { type: 'paragraph', content: 'New Paragraph' }]);
-    };
-
-    const updateContent = (index, newContent) => {
-        const updatedElements = elements.map((el, i) => 
-        i === index ? { ...el, content: newContent } : el
-        );
-        setElements(updatedElements);
-    };
+    
 
     function hsvToHex(h, s, v) {
         let r, g, b;
@@ -118,27 +128,8 @@ function Result() {
     const EyeChange = () => {
         setEyeState(prevEyeState => !prevEyeState);
     };
-    console.log(eyestate)
-    const[openaikey, setOpenAIKey] = useState('')
     const OpenAIKey = (e) => {
         setOpenAIKey(e.target.value)
-    }
-    // Assuming you have a function called 'handleSubmit' that is called when the submit button is clicked
-    function handleSubmit() {
-        // Get the current URL
-        const currentUrl = window.location.href;
-    
-        // Extract the domain from the current URL
-        const domain = new URL(currentUrl).hostname.split('.').slice(-2).join('.');
-    
-        // Generate a new subdomain
-        const subdomain = `subdomain-${Date.now()}.${domain}`;
-    
-        // Construct the new URL with the subdomain
-        const newUrl = `http://${subdomain}${window.location.pathname}${window.location.search}`;
-    
-        // Redirect the user to the new URL
-        window.location.href = newUrl;
     }
     const [loadings, setLoadings] = useState([]);
     const enterLoading = (index) => {
@@ -194,173 +185,254 @@ function Result() {
         </div>
     </button>
     );
-    const getBase64 = (file) =>
-    new Promise((resolve, reject) => {
+    const getBase64 = (file) => new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => resolve(reader.result);
         reader.onerror = (error) => reject(error);
     });
+
+    const pageUpdate = () => {
+        query.put(
+            'apps/update/' + pageId,
+            {
+                backgroundcolor: bkcolor,
+                textcolor: textcolor,
+                buttoncolor: buttoncolor,
+                apptitle: title,
+                appdescription: description,
+                formlabel: formlabel,
+                formdescription: formfield,
+                openAIkey: openaikey
+            },
+            (res) => {
+            }
+        )
+    }
     return (
-        <div className='flex gap-4 flex-wrap h-full lg:flex-nowrap'>
+        <div className='flex gap-4 flex-wrap lg:flex-nowrap'>
             <TitleCard
                 className="flex-grow"
-                title={"AI Tool Boox"}
+                title={"Title of the form (editable)"}
+                EyeIcon={true}
+                TopSideButtons={'Publish'}
+                isVisible={eyestate}
+                onEyeChange={EyeChange}
+                pageId={pageId}
+            >
+                <Space direction="vertical" className='w-full'>
+                    <Collapse
+                        collapsible="header"
+                        defaultActiveKey={['1']}
+                        icon={OpenAIOutlined}
+                        // className='w-full'
+                        expandIconPosition={'end'}
+                        items={[
+                            {
+                                key: '1',
+                                icon: {OpenAIOutlined},
+                                label: 'App Basics',
+                                children: 
+                                <>
+                                    <div className='flex'>
+                                        <label className='w-24 p-1'>Background:  </label>
+                                        <ColorPicker className='border-none	bg-inherit' defaultValue={bkcolor} onChange={bkColorChange} value={bkcolor}/>
+                                    </div>
+                                    <div className='flex'>
+                                        <label className='w-24 p-1'>Text:  </label>
+                                        <ColorPicker className='border-none	bg-inherit' defaultValue={textcolor} onChange={textColorChange} value={textcolor} />
+                                    </div>
+                                    <div className='flex'>
+                                        <label className='w-24 p-1'>Button:  </label>
+                                        <ColorPicker className='border-none	bg-inherit' defaultValue={buttoncolor} onChange={buttonColorChange} value={buttoncolor} />
+                                    </div>
+                                    <div className='flex mb-1.5'>
+                                        <label className='w-24 p-1'>App Title:  </label>
+                                        <Input rows={4} placeholder="maxLength is 10" maxLength={10} onChange={titleChange} value={title} />
+                                    </div>
+                                    <div className='flex'>
+                                        <label className='w-24 p-1'>Description:  </label>
+                                        <TextArea rows={4} placeholder="maxLength is 20" maxLength={20} onChange={descriptionChange} value={description} />
+                                    </div>
+                                </>,
+                            },
+                        ]}
+                    />
+                    <Collapse
+                        collapsible="header"
+                        icon={OpenAIOutlined}
+                        // className='w-full'
+                        expandIconPosition={'end'}
+                        items={[
+                            {
+                                key: '2',
+                                icon: {OpenAIOutlined},
+                                label: 'Form',
+                                children: 
+                                <>
+                                    <div className='flex mb-1.5'>
+                                        <label className='w-24 p-1'>Field Label:  </label>
+                                        <Input rows={4} placeholder="" maxLength={10} onChange={formlabelChange} value={formlabel}/>
+                                    </div>
+                                    <div className='flex'>
+                                        <label className='w-24 p-1'>Description:  </label>
+                                        <Input rows={4} placeholder="Placeholder Text" maxLength={100} onChange={formfieldChange} value={formfield} />
+                                    </div>
+                                </>,
+                            },
+                        ]}
+                    />
+                    <Collapse
+                        collapsible="header"
+                        icon={OpenAIOutlined}
+                        // className='w-full'
+                        expandIconPosition={'end'}
+                        items={[
+                            {
+                                key: '3',
+                                icon: {OpenAIOutlined},
+                                label: 'OpenAI',
+                                children: 
+                                <>
+                                    <div className='flex'>
+                                        <label className='w-24 p-1'>OpenAI Key:  </label>
+                                        <Input rows={4} placeholder="Please Input OpenAI Key" maxLength={1000} onChange={OpenAIKey} value={openaikey} />
+                                    </div>
+                                </>,
+                            },
+                        ]}
+                    />
+                </Space>
+                <Button type='primary' className="mt-9 inline-block float-right" onClick={pageUpdate}>{pageId ? "Update" : "Save"}</Button>
+            </TitleCard>
+            {/* <TitleCard
+                className="flex-grow"
+                title={"Title of the form (editable)"}
                 EyeIcon={true}
                 TopSideButtons={'Publish'}
                 isVisible={eyestate}
                 onEyeChange={EyeChange}
             >
-                <div className='grid grid-cols-4'>
-                    <div className='bg-slate-100 col-span-1 border-r px-[24px]'>
-                        <h2 className='mt-[40px]'>Title of the form (editable)</h2>
-                        <h2 className='mt-[40px]'>Display Text</h2>
-                        <div>
-                            <button onClick={addHeading}>Add Heading</button>
-                            <button onClick={addParagraph}>Add Paragraph</button>
-                            <div>
-                                {elements.map((el, index) => (
-                                el.type === 'heading' ? (
-                                    <Heading 
-                                    key={index} 
-                                    content={el.content} 
-                                    onUpdate={(newContent) => updateContent(index, newContent)} 
-                                    />
-                                ) : (
-                                    <Paragraph 
-                                    key={index} 
-                                    content={el.content} 
-                                    onUpdate={(newContent) => updateContent(index, newContent)} 
-                                    />
-                                )
-                                ))}
-                            </div>
-                            </div>
+                <div className='mt-8'>
+                    <p>This is just a test form with all components.</p>
+                    <div className='mt-8 flex flex-col'>
+                        <label>Label (for short answer)</label>
+                        <Input className='mt-2' showCount maxLength={120} style={{width: 400}}/>
                     </div>
-                    <div className='pt-[40px] col-span-2 px-8'>
-                        <p>This is just a test form with all components.</p>
-                        <div className='mt-8 flex flex-col'>
-                            <label>Label (for short answer)</label>
-                            <Input className='mt-2' showCount maxLength={120} style={{width: 400}}/>
-                        </div>
-                        <div className='mt-8'>
-                            <label>Label (for long answer / Active)</label>
-                            <TextArea
-                                showCount
-                                maxLength={1000}
-                                className='mt-2'
-                                // placeholder="disable resize"
-                                style={{
-                                    width: 600,
-                                    height: 160
-                                }}
+                    <div className='mt-8'>
+                        <label>Label (for long answer / Active)</label>
+                        <TextArea
+                            showCount
+                            maxLength={1000}
+                            className='mt-2'
+                            // placeholder="disable resize"
+                            style={{
+                                width: 600,
+                                height: 160
+                            }}
+                        />
+                    </div>
+                    <div className='mt-8 flex flex-col'>
+                        <label>Label (for single select)</label>
+                        <Radio.Group name="radiogroup" className='mt-2' defaultValue={1}>
+                            <Radio value={1}>A</Radio>
+                            <Radio value={2}>B</Radio>
+                            <Radio value={3}>C</Radio>
+                        </Radio.Group>
+                    </div>
+                    <div className='mt-8 flex flex-col'>
+                        <label>Label (for Multi select)</label>
+                        <Radio.Group name="radiogroup" className='mt-2' defaultValue={1}>
+                            <Radio value={1}>A</Radio>
+                            <Radio value={2}>B</Radio>
+                            <Radio value={3}>C</Radio>
+                        </Radio.Group>
+                    </div>
+                    <div className='mt-8 flex flex-col'>
+                        <label>Label (for Multi select)</label>
+                        <Dropdown.Button
+                            icon={<DownOutlined />}
+                            loading={loadings[1]}
+                            menu={{
+                                items,
+                            }}
+                            onClick={() => enterLoading(1)}
+                            style = {{
+                                width: 400
+                            }}
+                        >
+                            Search
+                        </Dropdown.Button>
+                    </div>
+                    <div className='mt-8 flex flex-col'>
+                        <label>Label (for Multi select)</label>
+                        <Upload
+                            action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+                            listType="picture-circle"
+                            fileList={fileList}
+                            className='mt-2'
+                            onPreview={handlePreview}
+                            onChange={handleChange}
+                        >
+                            {fileList.length >= 8 ? null : uploadButton}
+                        </Upload>
+                        {previewImage && (
+                            <Image
+                            wrapperStyle={{
+                                display: 'none',
+                            }}
+                            preview={{
+                                visible: previewOpen,
+                                onVisibleChange: (visible) => setPreviewOpen(visible),
+                                afterOpenChange: (visible) => !visible && setPreviewImage(''),
+                            }}
+                            src={previewImage}
                             />
-                        </div>
-                        <div className='mt-8 flex flex-col'>
-                            <label>Label (for single select)</label>
-                            <Radio.Group name="radiogroup" className='mt-2' defaultValue={1}>
-                                <Radio value={1}>A</Radio>
-                                <Radio value={2}>B</Radio>
-                                <Radio value={3}>C</Radio>
-                            </Radio.Group>
-                        </div>
-                        <div className='mt-8 flex flex-col'>
-                            <label>Label (for Multi select)</label>
-                            <Radio.Group name="radiogroup" className='mt-2' defaultValue={1}>
-                                <Radio value={1}>A</Radio>
-                                <Radio value={2}>B</Radio>
-                                <Radio value={3}>C</Radio>
-                            </Radio.Group>
-                        </div>
-                        <div className='mt-8 flex flex-col'>
-                            <label>Label (for Multi select)</label>
-                            <Dropdown.Button
-                                icon={<DownOutlined />}
-                                loading={loadings[1]}
-                                menu={{
-                                    items,
-                                }}
-                                onClick={() => enterLoading(1)}
-                                style = {{
-                                    width: 400
-                                }}
-                            >
-                                Search
-                            </Dropdown.Button>
-                        </div>
-                        <div className='mt-8 flex flex-col'>
-                            <label>Label (for Multi select)</label>
-                            <Upload
-                                action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
-                                listType="picture-circle"
-                                fileList={fileList}
-                                className='mt-2'
-                                onPreview={handlePreview}
-                                onChange={handleChange}
-                            >
-                                {fileList.length >= 8 ? null : uploadButton}
-                            </Upload>
-                            {previewImage && (
-                                <Image
-                                wrapperStyle={{
-                                    display: 'none',
-                                }}
-                                preview={{
-                                    visible: previewOpen,
-                                    onVisibleChange: (visible) => setPreviewOpen(visible),
-                                    afterOpenChange: (visible) => !visible && setPreviewImage(''),
-                                }}
-                                src={previewImage}
-                                />
-                            )}
-                        </div>
-                        <div className='mt-8 flex flex-col'>
-                            <label>Label (for Multi select)</label>
-                            <Input rows={4} className='mt-2' placeholder="" maxLength={10} style={{width: 400}}/>
-                        </div>
+                        )}
                     </div>
-                    <div className='pt-8 bg-slate-100 col-span1 border-l'>
-                        <h2 className='text-[14px] font-Lato ml-[25px]' >Options</h2>
+                    <div className='mt-8 flex flex-col'>
+                        <label>Label (for Multi select)</label>
+                        <Input rows={4} className='mt-2' placeholder="" maxLength={10} style={{width: 400}}/>
                     </div>
                 </div>
-            </TitleCard>
+            </TitleCard> */}
 
-            {/* <TitleCard
+            <TitleCard
                 className="flex-grow"
                 title={"Preview & Test Window"}
                 isVisible={eyestate}
             >
                 <div className='px-20 h-full py-5' style={{ backgroundColor: bkcolor, color: textcolor }}>
-                <h1 style={{ color: textcolor }} className='text-center mb-5 pt-8 text-4xl font-bold'>{title}</h1>
-                <h2 style={{ color: textcolor }} className='text-2xl mb-5'>{description}</h2>
-                <h3 style={{ color: textcolor }} className='text-xl mb-5'>{formlabel}</h3>
-                <textarea
-                    className='mb-4 w-full rounded-lg'
-                    rows={4}
-                    placeholder={formfield}
-                    maxLength={1000}
-                    onChange={e => setMyform(e.target.value)}
-                    value={myform}
-                    style = {{height: 200}}
-                />
-                <div wrap className='flex item-center justify-center'>
-                    <button
-                    className='mr-10 rounded-md w-20 font-bold text-white'
-                    style={{ backgroundColor: buttoncolor }}
-                    onClick={() => setMyform('')}
-                    >
-                    Clear<i data-lucide="paintbrush"></i>
-                    </button>
-                    <button
-                    className='rounded-md h-10 w-20 font-bold text-white'
-                    style={{ backgroundColor: buttoncolor }}
-                    onClick={() => alert('Form submitted!')}
-                    >
-                    Submit
-                    </button>
+                    <h1 style={{ color: textcolor }} className='text-center mb-5 pt-8 text-4xl font-bold'>{title}</h1>
+                    <h2 style={{ color: textcolor }} className='text-2xl mb-5'>{description}</h2>
+                    <h3 style={{ color: textcolor }} className='text-xl mb-5'>{formlabel}</h3>
+                    <textarea
+                        className='mb-4 w-full rounded-lg'
+                        rows={4}
+                        placeholder={formfield}
+                        maxLength={1000}
+                        onChange={e => setMyform(e.target.value)}
+                        value={myform}
+                        style = {{height: 200}}
+                    />
+                    <div wrap className='flex item-center justify-center'>
+                        <button
+                        className='mr-10 rounded-md w-20 font-bold text-white'
+                        style={{ backgroundColor: buttoncolor }}
+                        onClick={() => setMyform('')}
+                        >
+                        Clear<i data-lucide="paintbrush"></i>
+                        </button>
+                        <button
+                            className='rounded-md h-10 w-20 font-bold text-white'
+                            style={{ backgroundColor: buttoncolor }}
+                            onClick={() => alert('Form submitted!')}
+                        >
+                            Submit
+                        </button>
+                    </div>
                 </div>
-                </div>
-            </TitleCard> */}
+            </TitleCard>
         </div >
     )
 }

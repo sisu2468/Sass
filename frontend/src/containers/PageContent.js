@@ -48,7 +48,7 @@ function PageContent() {
         < ConfigProvider
             theme={ant_theme}
         >
-            <div className="drawer-content flex flex-col bg-slate-100">
+            <div className="drawer-content flex flex-col">
                 <Header onChangeTheme={setAppTheme} />
                 <main className="flex-1 overflow-y-auto  m-8 " ref={mainContentRef}>
                     <Suspense fallback={<SuspenseContent />}>
